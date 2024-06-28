@@ -1,6 +1,8 @@
-import { Channel, EmbedBuilder } from "discord.js";
+import { Channel, EmbedBuilder, Message, TextBasedChannel } from "discord.js";
 import { Discord, On } from "discordx";
 import type {ArgsOf, Client} from "discordx";
+
+const MODULE_NAME = 'onMessageLink';
 
 @Discord()
 export class onMessageLink {
@@ -10,46 +12,42 @@ export class onMessageLink {
 			return
 		}		
 
+		console.log(`[${MODULE_NAME}] received messageCreate event with message link`);
 		const idsInUrl = message.content.match(/https:\/\/discord\.com\/channels\/(\d+)\/(\d+)\/(\d+)/);
-		if (idsInUrl == null) {
-			return console.error("Failed to parse ids in message link url: " + message.content);
+		if (!idsInUrl) {
+			return console.error(`[${MODULE_NAME}] failed to parse ids in message link url: ${message.content}`);
 		}
 
 		const channelId = idsInUrl[2];
 		const messageId = idsInUrl[3];
 
-		let linkChannel;
-		try {
-			linkChannel = await client.channels.fetch(channelId);
-		} catch (error) {
-			console.error(`unable to fetch channel: ${error}`);
+		const linkChannel = await fetchChannel(client, channelId);
+		if (!linkChannel) {
+			console.error(`[${MODULE_NAME}] channel returned null`);
 			return
-		}
-		if (linkChannel == null) {
-			return console.error("Channel returned null in fetching message link: " + message.content);
 		}
 		if (!linkChannel.isTextBased()) {
 			return
 		}
 
-		let linkMessage;
-		try {
-			linkMessage = await linkChannel.messages.fetch(messageId);
-		} catch (error) {
-			console.error(`unable to fetch message: ${error}`);
+		const linkMessage = await fetchMessage(linkChannel, messageId);
+		if (!linkMessage) {
+			console.error(`[${MODULE_NAME}] message returned null`);
 			return
 		}
 
 		const messageLinkEmbed = new EmbedBuilder()
-					.setColor("#94e2d5")
-					.setAuthor({name: `${linkMessage.author.displayName} said...`, iconURL: linkMessage.author.avatarURL() ?? undefined, url: linkMessage.url })
-					.setTimestamp(linkMessage.createdTimestamp);
+			.setColor("#94e2d5")
+			.setAuthor({name: `${linkMessage.author.displayName} said...`, iconURL: linkMessage.author.avatarURL() ?? undefined, url: linkMessage.url })
+			.setTimestamp(linkMessage.createdTimestamp);
+
 		if (linkMessage.content != "") {
 			messageLinkEmbed.setDescription(">>> " + linkMessage.content);
 		}
+
 		if (linkMessage.attachments.size != 0) {
 			const firstAttachment = linkMessage.attachments.first();
-			if ( firstAttachment != undefined) {
+			if (firstAttachment) {
 				messageLinkEmbed.setImage(firstAttachment.url)
 			} 
 			let value = "";
@@ -63,8 +61,26 @@ export class onMessageLink {
 			await message.channel.send({embeds: [messageLinkEmbed]});
 			await message.react("✅");
 		} catch (error) {
-			console.error(`unable to send embed: ${error}`);
+			console.error(`[${MODULE_NAME}] unable to send embed: ${error}`);
 			return
 		}		
+	}
+}
+
+async function fetchChannel(client: Client, channelId: string): Promise<Channel | null> {
+	try {
+		return await client.channels.fetch(channelId);
+	} catch (error) {
+		console.error(`[${MODULE_NAME}] unable to fetch channel: ${error}`);
+		return null
+	}
+}
+
+async function fetchMessage(channel: TextBasedChannel, messageId: string): Promise<Message<boolean> | null> {
+	try {
+		return await channel.messages.fetch(messageId);
+	} catch (error) {
+		console.error(`[${MODULE_NAME}] unable to fetch message: ${error}`);
+		return null
 	}
 }
