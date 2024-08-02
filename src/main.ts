@@ -1,4 +1,5 @@
 import { dirname, importx } from "@discordx/importer";
+import { Node, QueueManager } from "@discordx/music";
 import type { Interaction, Message } from "discord.js";
 import { IntentsBitField } from "discord.js";
 import { Client } from "discordx";
@@ -24,6 +25,10 @@ export const bot = new Client({
     prefix: "!",
   },
 });
+
+const audioNode = new Node(bot);
+export const audioManager = new QueueManager(audioNode);
+
 
 bot.once("ready", () => {
   // Make sure all guilds are cached
