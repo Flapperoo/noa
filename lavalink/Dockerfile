@@ -9,7 +9,6 @@ WORKDIR /app
 #Copy Lavalink files
 COPY Lavalink.jar .
 COPY application.yml .
-COPY plugins ./plugins
 
 #Run Lavalink
 CMD [ "java", "-jar", "Lavalink.jar" ]
