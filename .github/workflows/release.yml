@@ -49,7 +49,7 @@ jobs:
           docker push $IMAGE_ID:$VERSION
 
       - name: Build lavalink image
-        run: docker build . --file lavalink/Dockerfile --tag $IMAGE_NAME_LL --label "runnumber=${GITHUB_RUN_ID}"
+        run: docker build lavalink/. --file lavalink/Dockerfile --tag $IMAGE_NAME_LL --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Push lavalink image
         run: |
