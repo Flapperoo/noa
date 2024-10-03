@@ -11,9 +11,13 @@ plugins:
     enabled: true
     allowSearch: true
     allowDirectVideoIds: true
+    allowDirectPlaylistIds: true
     clients:
       - MUSIC
       - ANDROID_TESTSUITE
+      - WEB
+      - TVHTML5EMBEDDED
+
 lavalink:
   plugins:
 #    - dependency: "com.github.example:example-plugin:1.0.0" # required, the coordinates of your plugin
