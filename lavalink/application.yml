@@ -28,7 +28,7 @@ lavalink:
 #  pluginsDir: "./plugins" # optional, defaults to "./plugins"
 #  defaultPluginRepository: "https://maven.lavalink.dev/releases" # optional, defaults to the Lavalink release repository
 #  defaultPluginSnapshotRepository: "https://maven.lavalink.dev/snapshots" # optional, defaults to the Lavalink snapshot repository
-    - dependency: "dev.lavalink.youtube:youtube-plugin:1.11.4"
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.12.0"
       snapshot: false
   server:
     password: "youshallnotpass"
